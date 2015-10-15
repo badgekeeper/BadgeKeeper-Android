@@ -28,18 +28,38 @@
 
 package net.badgekeeper.android.network;
 
-import net.badgekeeper.android.objects.models.BKProjectInformation;
-import net.badgekeeper.android.objects.models.BKResponse;
-
+import java.util.List;
 import retrofit.Call;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
+
+import net.badgekeeper.android.objects.BKKeyValuePair;
+import net.badgekeeper.android.objects.models.BKProjectInformation;
+import net.badgekeeper.android.objects.models.BKUnlockedUserAchievement;
+import net.badgekeeper.android.objects.models.BKUserAchievement;
 
 public interface BadgeKeeperApi {
 
     @GET("api/gateway/{projectId}/get")
-    Call<BKResponse<BKProjectInformation>> getProjectAchievements(@Path("projectId") String projectId,
+    Call<BadgeKeeperResponse<BKProjectInformation>> getProjectAchievements(@Path("projectId") String projectId,
                                                                   @Query("shouldLoadIcons") boolean shouldLoadIcons);
+
+    @GET("api/gateway/{projectId}/users/get/{userId}")
+    Call<BadgeKeeperResponse<BKUserAchievement[]>> getUserAchievements(@Path("projectId") String projectId,
+                                                              @Path("userId") String userId,
+                                                              @Query("shouldLoadIcons") boolean shouldLoadIcons);
+
+    @POST("api/gateway/{projectId}/users/post/{userId}")
+    Call<BadgeKeeperResponse<BKUnlockedUserAchievement[]>> postUserVariables(@Path("projectId") String projectId,
+                                                                             @Path("userId") String userId,
+                                                                             @Body List<BKKeyValuePair<String, Double>> values);
+
+    @POST("api/gateway/{projectId}/users/increment/{userId}")
+    Call<BadgeKeeperResponse<BKUnlockedUserAchievement[]>> incrementUserVariables(@Path("projectId") String projectId,
+                                                                                  @Path("userId") String userId,
+                                                                                  @Body List<BKKeyValuePair<String, Double>> values);
 
 }

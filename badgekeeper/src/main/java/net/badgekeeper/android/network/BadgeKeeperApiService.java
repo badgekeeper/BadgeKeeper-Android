@@ -26,13 +26,26 @@
 
  */
 
-package net.badgekeeper.android.objects;
+package net.badgekeeper.android.network;
 
-import org.json.JSONObject;
+import retrofit.Retrofit;
+import retrofit.GsonConverterFactory;
+import retrofit.RxJavaCallAdapterFactory;
 
-/**
- * Base class for Badge Keeper service instances.
- */
-public abstract class BKObject extends Object {
-    public abstract boolean initWithJson(JSONObject json);
+public class BadgeKeeperApiService {
+
+    private static final String BaseUrl = "https://api.badgekeeper.net/";
+    private BadgeKeeperApi api;
+
+    public BadgeKeeperApiService() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+
+        api = retrofit.create(BadgeKeeperApi.class);
+    }
+
+    public BadgeKeeperApi getApi() { return api; }
 }

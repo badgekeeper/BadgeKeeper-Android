@@ -30,8 +30,49 @@ package net.badgekeeper.android;
 
 import java.util.List;
 import net.badgekeeper.android.objects.models.BKProjectAchievement;
+import net.badgekeeper.android.objects.models.BKUnlockedUserAchievement;
+import net.badgekeeper.android.objects.models.BKUserAchievement;
 
+/**
+ * Interface for notifying your app when response received from Badge Keeper service.
+ */
 public interface BadgeKeeperCallback {
-    void didReceiveProjectAchievements(List<BKProjectAchievement> achievements);
-    void didReceiveErrorProjectAchievements(String description);
+    /**
+     * Project achievements successfully received.
+     * @param achievements - received achievements array.
+     */
+    void didReceiveProjectAchievements(BKProjectAchievement[] achievements);
+
+    /**
+     * Something goes wrong with receiving achievements by project.
+     * @param code - error code.
+     * @param message - error message.
+     */
+    void didReceiveErrorProjectAchievements(int code, String message);
+
+    /**
+     * User achievements successfully received.
+     * @param achievements - received achievements array.
+     */
+    void didReceiveUserAchievements(BKUserAchievement[] achievements);
+
+    /**
+     * Something goes wrong with receiving achievements by user.
+     * @param code - error code.
+     * @param message - error message.
+     */
+    void didReceiveErrorUserAchievements(int code, String message);
+
+    /**
+     * Unlocked user achievements successfully received (if exist).
+     * @param achievements - received achievements array.
+     */
+    void didReceiveUnlockedUserAchievements(BKUnlockedUserAchievement[] achievements);
+
+    /**
+     * Something goes wrong with posting variables for user.
+     * @param code - error code.
+     * @param message - error message.
+     */
+    void didReceiveErrorUnlockedUserAchievements(int code, String message);
 }

@@ -28,37 +28,19 @@
 
 package net.badgekeeper.android.objects.models;
 
-//import org.json.JSONObject;
-//import org.json.JSONException;
 import com.google.gson.annotations.SerializedName;
-//import net.badgekeeper.android.objects.BKObject;
 /**
  * Present general element in Badge Keeper service - achievement.
  */
 public class BKProjectAchievement {
 
     private @SerializedName("DisplayName") String displayName;
-
-    /*private String displayName;
-    private String description;
-    private String iconUnlocked;
-    private String iconLocked;
-
-    public boolean initWithJson(JSONObject json) {
-        try {
-            this.displayName = json.getString("DisplayName");
-            this.description = json.getString("Description");
-            this.iconUnlocked = json.getString("UnlockedIcon");
-            this.iconLocked = json.getString("LockedIcon");
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        return true;
-    }*/
+    private @SerializedName("Description") String description;
+    private @SerializedName("UnlockedIcon") String iconUnlocked;
+    private @SerializedName("LockedIcon") String iconLocked;
 
     public String getDisplayName() { return displayName; }
-    //public String getDescription() { return description; }
-    //public String getIconUnlocked() { return iconUnlocked; }
-    //public String getIconLocked() { return iconLocked; }
+    public String getDescription() { return description; }
+    public String getIconUnlocked() { return iconUnlocked; }
+    public String getIconLocked() { return iconLocked; }
 }

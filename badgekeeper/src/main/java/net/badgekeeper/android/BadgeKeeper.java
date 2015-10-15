@@ -28,34 +28,48 @@
 
 package net.badgekeeper.android;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
+
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
 import net.badgekeeper.android.network.BadgeKeeperApi;
-import net.badgekeeper.android.network.BadgeKeeperService;
-import net.badgekeeper.android.objects.models.BKProjectAchievement;
+import net.badgekeeper.android.network.BadgeKeeperApiService;
+import net.badgekeeper.android.objects.BKKeyValuePair;
 import net.badgekeeper.android.objects.models.BKProjectInformation;
-import net.badgekeeper.android.objects.models.BKResponse;
-import net.badgekeeper.android.objects.models.BKResponseError;
+import net.badgekeeper.android.network.BadgeKeeperResponse;
+import net.badgekeeper.android.network.BadgeKeeperResponseError;
+import net.badgekeeper.android.objects.models.BKUnlockedUserAchievement;
+import net.badgekeeper.android.objects.models.BKUserAchievement;
 
 public class BadgeKeeper {
     private static BadgeKeeper instance = new BadgeKeeper();
 
-    public static BadgeKeeper getInstance() {
-        return instance;
+    // Service instances
+    private BadgeKeeperCallback callback = null;
+    private BadgeKeeperApiService service = null;
+
+    // Service properties
+    private String projectId = null;
+    private String userId = null;
+    private boolean shouldLoadIcons = false;
+
+    // Temporary storages
+    private Map<String, List<BKKeyValuePair<String, Double>>> postVariables = new HashMap<>();
+    private Map<String, List<BKKeyValuePair<String, Double>>> incrementVariables = new HashMap<>();
+
+    private interface BKInternalCallback <Type> {
+        void onSuccess(Type type);
+        void onError(int code, String message);
     }
 
-    private String projectId;
-    private String userId;
-    private boolean shouldLoadIcons = false;
-    private BadgeKeeperCallback callback = null;
-    private BadgeKeeperService service = null;
-
     private BadgeKeeper() {
-        service = new BadgeKeeperService();
+        service = new BadgeKeeperApiService();
     }
 
     /**
@@ -63,14 +77,14 @@ public class BadgeKeeper {
      * @param projectId - Project Id from Badge Keeper admin panel.
      */
     public static void setProjectId(String projectId) {
-        getInstance().projectId = projectId;
+        instance.projectId = projectId;
     }
 
     /**
      * Setup User Id for Badge Keeper instance. This is client unique id in your system.
      * @param userId - Unique client Id in your system.
      */
-    public static void setUserId(String userId) { getInstance().userId = userId; }
+    public static void setUserId(String userId) { instance.userId = userId; }
 
     /**
      * When sets to true load achievement icons from Badge Keeper service
@@ -78,49 +92,68 @@ public class BadgeKeeper {
      * Sets this parameter to false can reduce traffic and you will get response faster.
      * @param shouldLoadIcons - Should we request images from Badge Keeper service or not.
      */
-    public static void setShouldLoadIcons(boolean shouldLoadIcons) { getInstance().shouldLoadIcons = shouldLoadIcons; }
+    public static void setShouldLoadIcons(boolean shouldLoadIcons) { instance.shouldLoadIcons = shouldLoadIcons; }
 
     /**
      * Setup callback to notify system with event after Badge Keeper request.
      * @param callback - Callback in application to receive Badge Keeper notifications.
      */
-    public static void setCallback(BadgeKeeperCallback callback) { getInstance().callback = callback; }
+    public static void setCallback(BadgeKeeperCallback callback) { instance.callback = callback; }
 
     /**
      * Requests all project achievements list.
+     * Check that Project Id and callback configured.
      */
     public static void requestProjectAchievements() {
-        BadgeKeeperApi api = getInstance().service.getApi();
-        Call<BKResponse<BKProjectInformation>> call = api.getProjectAchievements(getInstance().projectId, false);
+        // Validation
+        if (!instance.isParametersValid()) {
+            return;
+        }
 
-        call.enqueue(new Callback<BKResponse<BKProjectInformation>>() {
+        final BKInternalCallback<BKProjectInformation> callback = new BKInternalCallback<BKProjectInformation>() {
             @Override
-            public void onResponse(Response<BKResponse<BKProjectInformation>> response, Retrofit retrofit) {
-                if (getInstance().callback != null) {
-                    BKResponse<BKProjectInformation> bkResponse = response.body();
-                    BKResponseError error = bkResponse.getError();
-                    BKProjectInformation resulsss = bkResponse.getResult();
-                    int i = 0;
-                    int k = 4;
-                    String xa = "asdfsd" + "asdf";
-                    //getInstance().callback.didReceiveProjectAchievements(response.body());
-                }
+            public void onSuccess(BKProjectInformation bkProjectInformation) {
+                instance.callback.didReceiveProjectAchievements(bkProjectInformation.getAchievements());
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                if (getInstance().callback != null) {
-                    getInstance().callback.didReceiveErrorProjectAchievements(t.getLocalizedMessage());
-                }
+            public void onError(int code, String message) {
+                instance.callback.didReceiveErrorProjectAchievements(code, message);
             }
-        });
+        };
+
+        // Invoke
+        BadgeKeeperApi api = instance.service.getApi();
+        Call<BadgeKeeperResponse<BKProjectInformation>> call = api.getProjectAchievements(instance.projectId, instance.shouldLoadIcons);
+        instance.makeRequest(callback, call);
     }
 
     /**
-     * Requests all achievements that are unlocked by the specified user ID.
+     * Requests all user achievements list.
+     * Check that Project Id, User Id and callback configured.
      */
     public static void requestUserAchievements() {
+        // Validation
+        if (!instance.isParametersValid()) {
+            return;
+        }
 
+        final BKInternalCallback<BKUserAchievement[]> callback = new BKInternalCallback<BKUserAchievement[]>() {
+            @Override
+            public void onSuccess(BKUserAchievement[] userAchievements) {
+                instance.callback.didReceiveUserAchievements(userAchievements);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                instance.callback.didReceiveErrorUserAchievements(code, message);
+            }
+        };
+
+        // Invoke
+        BadgeKeeperApi api = instance.service.getApi();
+        Call<BadgeKeeperResponse<BKUserAchievement[]>> call = api.getUserAchievements(instance.projectId, instance.userId, instance.shouldLoadIcons);
+        instance.makeRequest(callback, call);
     }
 
     /**
@@ -128,8 +161,8 @@ public class BadgeKeeper {
      * @param value - New value to set. Old value will be overwritten.
      * @param key - Target key to validate achievements.
      */
-    public void preparePostKeyWithValue(String key, double value) {
-
+    public static void preparePostKeyWithValue(String key, double value) {
+        instance.prepareKeyWithValue(key, value, instance.postVariables);
     }
 
     /**
@@ -137,26 +170,49 @@ public class BadgeKeeper {
      * @param value - Increment old value.
      * @param key - Target key to validate achievements.
      */
-    public void prepareIncrementKeyWithValue(String key, double value) {
-
+    public static void prepareIncrementKeyWithValue(String key, double value) {
+        instance.prepareKeyWithValue(key, value, instance.incrementVariables);
     }
 
     /**
      * Sends all prepared values to server to overwrite them and validate achievements completion.
      * Before sending values must be prepared via <tt>preparePostValue:forKey:</tt> method calls.
      */
-    public void postPreparedValues() {
-
+    public static void postPreparedValues() {
+        postPreparedValuesForUserId(instance.userId);
     }
 
     /**
      * Overloaded postPreparedValues for specific user.
      * Before sending values must be prepared via <tt>prepareIncrementValue:forKey:</tt> method calls.
      * @param userId - User ID which prepared values should be sent.
-     *               If set to <tt>nil</tt> then current active user ID will be used.
+     *               If set to <tt>null</tt> then current active user ID will be used.
      */
-    public void postPreparedValuesForUserId(String userId) {
+    public static void postPreparedValuesForUserId(String userId) {
+        // Validation
+        if (!instance.isParametersValid()) {
+            return;
+        }
 
+        List<BKKeyValuePair<String, Double>> values = instance.postVariables.get(userId);
+        if (values != null && !values.isEmpty()) {
+            final BKInternalCallback<BKUnlockedUserAchievement[]> callback = new BKInternalCallback<BKUnlockedUserAchievement[]>() {
+                @Override
+                public void onSuccess(BKUnlockedUserAchievement[] unlockedUserAchievements) {
+                    instance.callback.didReceiveUnlockedUserAchievements(unlockedUserAchievements);
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    instance.callback.didReceiveErrorUnlockedUserAchievements(code, message);
+                }
+            };
+
+            // Invoke
+            BadgeKeeperApi api = instance.service.getApi();
+            Call<BadgeKeeperResponse<BKUnlockedUserAchievement[]>> call = api.postUserVariables(instance.projectId, instance.userId, values);
+            instance.makeRequest(callback, call);
+        }
     }
 
     /**
@@ -164,8 +220,8 @@ public class BadgeKeeper {
      * Before sending values must be prepared via <tt>prepareIncrementValue:forKey:</tt> method calls.
      * After successful sending all prepared values will be removed from memory.
      */
-    public void incrementPreparedValues() {
-
+    public static void incrementPreparedValues() {
+        incrementPreparedValuesForUserId(instance.userId);
     }
 
     /**
@@ -175,8 +231,31 @@ public class BadgeKeeper {
      * @param userId - User ID which prepared values should be sent.
      *               If set to <tt>null</tt> then current active user ID will be used.
      */
-     public void incrementPreparedValuesForUserId(String userId) {
+     public static void incrementPreparedValuesForUserId(String userId) {
+         // Validation
+         if (!instance.isParametersValid()) {
+             return;
+         }
 
+         List<BKKeyValuePair<String, Double>> values = instance.incrementVariables.get(userId);
+         if (values != null && !values.isEmpty()) {
+             final BKInternalCallback<BKUnlockedUserAchievement[]> callback = new BKInternalCallback<BKUnlockedUserAchievement[]>() {
+                 @Override
+                 public void onSuccess(BKUnlockedUserAchievement[] unlockedUserAchievements) {
+                     instance.callback.didReceiveUnlockedUserAchievements(unlockedUserAchievements);
+                 }
+
+                 @Override
+                 public void onError(int code, String message) {
+                     instance.callback.didReceiveErrorUnlockedUserAchievements(code, message);
+                 }
+             };
+
+             // Invoke
+             BadgeKeeperApi api = instance.service.getApi();
+             Call<BadgeKeeperResponse<BKUnlockedUserAchievement[]>> call = api.incrementUserVariables(instance.projectId, instance.userId, values);
+             instance.makeRequest(callback, call);
+         }
      }
 
     /**
@@ -186,6 +265,7 @@ public class BadgeKeeper {
      * @return - true (if parameter successfully taken), false (otherwise).
      */
     public boolean readRewardValuesForNameWithValues(String name, List<Double> values) {
+        //TODO: todo
         return false;
     }
 
@@ -197,15 +277,62 @@ public class BadgeKeeper {
      * @return - true (if parameter successfully taken), false (otherwise).
      */
     public boolean readUserRewardValuesForNameWithValues(String userId, String name, List<Double> values) {
+        //TODO: todo
         return false;
     }
 
-    /**
-     * Build image with raw icon data.
-     * @param iconString - raw icon data from BadgeKeeper service for UnlockedIcon or LockedIcon.
-     * @return - image (if data exist), null (otherwise).
-     */
+    ///**
+    // * Build image with raw icon data.
+    // * @param iconString - raw icon data from BadgeKeeper service for UnlockedIcon or LockedIcon.
+    // * @return - image (if data exist), null (otherwise).
+    // */
     //public Image buildImageWithIconString(String iconString) {
     //    return null;
     //}
+
+    private <Type> void makeRequest(final BKInternalCallback callback, Call<BadgeKeeperResponse<Type>> call) {
+
+        call.enqueue(new Callback<BadgeKeeperResponse<Type>>() {
+            @Override
+            public void onResponse(Response<BadgeKeeperResponse<Type>> response, Retrofit retrofit) {
+                if (instance.callback != null) {
+                    BadgeKeeperResponse<Type> bkResponse = response.body();
+                    BadgeKeeperResponseError error = bkResponse.getError();
+                    if (error != null) {
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                    else {
+                        Type typeResult = bkResponse.getResult();
+                        callback.onSuccess(typeResult);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callback.onError(-1, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    private void prepareKeyWithValue(String key, Double value, Map<String, List<BKKeyValuePair<String, Double>>> dictionary) {
+        if (!dictionary.containsKey(userId)) {
+            dictionary.put(userId, new ArrayList<BKKeyValuePair<String, Double>>());
+        }
+
+        BKKeyValuePair<String, Double> pair = new BKKeyValuePair<>(key, value);
+        dictionary.get(userId).add(pair);
+    }
+
+    // Configuration validation
+    private boolean isParametersValid() {
+        assert (this.callback != null);
+        assert (this.projectId != null && !this.projectId.isEmpty());
+        assert (this.userId != null && !this.userId.isEmpty());
+
+        if (this.callback == null || this.projectId == null || this.projectId.isEmpty() || this.userId == null || this.userId.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
 }

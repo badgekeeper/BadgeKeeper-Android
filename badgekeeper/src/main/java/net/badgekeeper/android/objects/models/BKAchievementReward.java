@@ -28,16 +28,9 @@
 
 package net.badgekeeper.android.objects.models;
 
-import org.json.JSONObject;
-import net.badgekeeper.android.objects.BKObject;
-
 /**
  * Present reward element in Badge Keeper service.
  */
-public class BKAchievementReward extends BKObject {
-
-    public boolean initWithJson(JSONObject json) {
-        return false;
-    }
+public class BKAchievementReward {
 
 }

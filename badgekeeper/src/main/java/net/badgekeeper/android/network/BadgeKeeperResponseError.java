@@ -28,24 +28,12 @@
 
 package net.badgekeeper.android.network;
 
-import retrofit.Retrofit;
-import retrofit.GsonConverterFactory;
-import retrofit.RxJavaCallAdapterFactory;
+import com.google.gson.annotations.SerializedName;
 
-public class BadgeKeeperService {
+public class BadgeKeeperResponseError {
+    private @SerializedName("Code") int code;
+    private @SerializedName("Message") String message;
 
-    private static final String BaseUrl = "https://api.badgekeeper.net/";
-    private BadgeKeeperApi api;
-
-    public BadgeKeeperService() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BaseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
-
-        api = retrofit.create(BadgeKeeperApi.class);
-    }
-
-    public BadgeKeeperApi getApi() { return api; }
+    public int getCode() { return code; }
+    public String getMessage() { return message; }
 }

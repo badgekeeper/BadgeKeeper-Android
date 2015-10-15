@@ -34,16 +34,15 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import net.badgekeeper.android.objects.BKObject;
 
-public class BKUnlockedUserAchievement extends BKObject {
+public class BKUnlockedUserAchievement {
 
     private List<BKAchievementReward> rewards = new ArrayList<BKAchievementReward>();
     private BKUserAchievement achievement;
 
     public boolean initWithJson(JSONObject json) {
         this.achievement = new BKUserAchievement();
-        this.achievement.initWithJson(json);
+        //this.achievement.initWithJson(json);
         this.rewards.clear();
 
         try {
@@ -52,9 +51,9 @@ public class BKUnlockedUserAchievement extends BKObject {
             for (int i = 0; i < jsonRewards.length(); ++i) {
                 JSONObject jsonReward = jsonRewards.getJSONObject(i);
                 BKAchievementReward reward = new BKAchievementReward();
-                if (reward.initWithJson(jsonReward)) {
-                    this.rewards.add(reward);
-                }
+                //if (reward.initWithJson(jsonReward)) {
+                //    this.rewards.add(reward);
+                //}
             }
         }
         catch (JSONException e) {

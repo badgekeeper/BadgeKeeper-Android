@@ -26,39 +26,15 @@
 
  */
 
-package net.badgekeeper.android.objects.models;
+package net.badgekeeper.android.network;
 
-import net.badgekeeper.android.objects.BKObject;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-import java.util.ArrayList;
+public class BadgeKeeperResponse<Type> {
+    private @SerializedName("Error")
+    BadgeKeeperResponseError error;
+    private @SerializedName("Result") Type result;
 
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-public class BKUnlockedUserAchievementList extends BKObject {
-
-    private List<BKUnlockedUserAchievement> achievements = new ArrayList<BKUnlockedUserAchievement>();
-
-    public boolean initWithJson(JSONObject json) {
-        this.achievements.clear();
-
-        try {
-            JSONArray jsonRewards = json.getJSONArray("Result");
-
-            for (int i = 0; i < jsonRewards.length(); ++i) {
-                JSONObject jsonReward = jsonRewards.getJSONObject(i);
-                BKUnlockedUserAchievement achievement = new BKUnlockedUserAchievement();
-                if (achievement.initWithJson(jsonReward)) {
-                    this.achievements.add(achievement);
-                }
-            }
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        return true;
-    }
-
+    public BadgeKeeperResponseError getError() { return error; }
+    public Type getResult() { return result; }
 }

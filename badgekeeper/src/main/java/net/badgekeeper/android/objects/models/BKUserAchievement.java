@@ -32,24 +32,11 @@
  */
 package net.badgekeeper.android.objects.models;
 
-import org.json.JSONObject;
-import org.json.JSONException;
+import com.google.gson.annotations.SerializedName;
 
 public class BKUserAchievement extends BKProjectAchievement {
 
-    private boolean isUnlocked;
-
-    public boolean initWithJson(JSONObject json) {
-        //super.initWithJson(json);
-        try {
-            this.isUnlocked = json.getBoolean("IsUnlocked");
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        return true;
-    }
-
+    private @SerializedName("IsUnlocked") boolean isUnlocked;
     public boolean getIsUnlocked() {
         return isUnlocked;
     }

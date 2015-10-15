@@ -29,35 +29,48 @@
 package net.badgekeeper.android;
 
 import java.util.List;
-import android.media.Image;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
+
+import net.badgekeeper.android.network.BadgeKeeperApi;
+import net.badgekeeper.android.network.BadgeKeeperService;
+import net.badgekeeper.android.objects.models.BKProjectAchievement;
+import net.badgekeeper.android.objects.models.BKProjectInformation;
+import net.badgekeeper.android.objects.models.BKResponse;
+import net.badgekeeper.android.objects.models.BKResponseError;
 
 public class BadgeKeeper {
-    private static BadgeKeeper ourInstance = new BadgeKeeper();
+    private static BadgeKeeper instance = new BadgeKeeper();
 
     public static BadgeKeeper getInstance() {
-        return ourInstance;
+        return instance;
     }
 
     private String projectId;
     private String userId;
     private boolean shouldLoadIcons = false;
+    private BadgeKeeperCallback callback = null;
+    private BadgeKeeperService service = null;
 
     private BadgeKeeper() {
+        service = new BadgeKeeperService();
     }
 
     /**
      * Setup Project Id for Badge Keeper instance. You can find Project Id in admin panel.
      * @param projectId - Project Id from Badge Keeper admin panel.
      */
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
+    public static void setProjectId(String projectId) {
+        getInstance().projectId = projectId;
     }
 
     /**
      * Setup User Id for Badge Keeper instance. This is client unique id in your system.
      * @param userId - Unique client Id in your system.
      */
-    public void setUserId(String userId) { this.userId = userId; }
+    public static void setUserId(String userId) { getInstance().userId = userId; }
 
     /**
      * When sets to true load achievement icons from Badge Keeper service
@@ -65,19 +78,48 @@ public class BadgeKeeper {
      * Sets this parameter to false can reduce traffic and you will get response faster.
      * @param shouldLoadIcons - Should we request images from Badge Keeper service or not.
      */
-    public void setShouldLoadIcons(boolean shouldLoadIcons) { this.shouldLoadIcons = shouldLoadIcons; }
+    public static void setShouldLoadIcons(boolean shouldLoadIcons) { getInstance().shouldLoadIcons = shouldLoadIcons; }
+
+    /**
+     * Setup callback to notify system with event after Badge Keeper request.
+     * @param callback - Callback in application to receive Badge Keeper notifications.
+     */
+    public static void setCallback(BadgeKeeperCallback callback) { getInstance().callback = callback; }
 
     /**
      * Requests all project achievements list.
      */
-    public void requestProjectAchievements() {
+    public static void requestProjectAchievements() {
+        BadgeKeeperApi api = getInstance().service.getApi();
+        Call<BKResponse<BKProjectInformation>> call = api.getProjectAchievements(getInstance().projectId, false);
 
+        call.enqueue(new Callback<BKResponse<BKProjectInformation>>() {
+            @Override
+            public void onResponse(Response<BKResponse<BKProjectInformation>> response, Retrofit retrofit) {
+                if (getInstance().callback != null) {
+                    BKResponse<BKProjectInformation> bkResponse = response.body();
+                    BKResponseError error = bkResponse.getError();
+                    BKProjectInformation resulsss = bkResponse.getResult();
+                    int i = 0;
+                    int k = 4;
+                    String xa = "asdfsd" + "asdf";
+                    //getInstance().callback.didReceiveProjectAchievements(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                if (getInstance().callback != null) {
+                    getInstance().callback.didReceiveErrorProjectAchievements(t.getLocalizedMessage());
+                }
+            }
+        });
     }
 
     /**
      * Requests all achievements that are unlocked by the specified user ID.
      */
-    public void requestUserAchievements() {
+    public static void requestUserAchievements() {
 
     }
 
@@ -163,7 +205,7 @@ public class BadgeKeeper {
      * @param iconString - raw icon data from BadgeKeeper service for UnlockedIcon or LockedIcon.
      * @return - image (if data exist), null (otherwise).
      */
-    public Image buildImageWithIconString(String iconString) {
-        return null;
-    }
+    //public Image buildImageWithIconString(String iconString) {
+    //    return null;
+    //}
 }

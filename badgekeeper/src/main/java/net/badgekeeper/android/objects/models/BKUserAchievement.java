@@ -30,7 +30,7 @@
  * Extended BKProjectAchievement for User.
  * Contains extra field with status of user achievement.
  */
-package net.badgekeeper.android.objects.achievements;
+package net.badgekeeper.android.objects.models;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -40,7 +40,7 @@ public class BKUserAchievement extends BKProjectAchievement {
     private boolean isUnlocked;
 
     public boolean initWithJson(JSONObject json) {
-        super.initWithJson(json);
+        //super.initWithJson(json);
         try {
             this.isUnlocked = json.getBoolean("IsUnlocked");
         }

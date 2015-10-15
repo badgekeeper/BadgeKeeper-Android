@@ -26,37 +26,20 @@
 
  */
 
-package net.badgekeeper.android.objects.achievements;
+package net.badgekeeper.android.network;
 
-import org.json.JSONObject;
-import org.json.JSONException;
-import net.badgekeeper.android.objects.BKObject;
+import net.badgekeeper.android.objects.models.BKProjectInformation;
+import net.badgekeeper.android.objects.models.BKResponse;
 
-/**
- * Present general element in Badge Keeper service - achievement.
- */
-public class BKProjectAchievement extends BKObject {
+import retrofit.Call;
+import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.http.Query;
 
-    private String displayName;
-    private String description;
-    private String iconUnlocked;
-    private String iconLocked;
+public interface BadgeKeeperApi {
 
-    public boolean initWithJson(JSONObject json) {
-        try {
-            this.displayName = json.getString("DisplayName");
-            this.description = json.getString("Description");
-            this.iconUnlocked = json.getString("UnlockedIcon");
-            this.iconLocked = json.getString("LockedIcon");
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        return true;
-    }
+    @GET("api/gateway/{projectId}/get")
+    Call<BKResponse<BKProjectInformation>> getProjectAchievements(@Path("projectId") String projectId,
+                                                                  @Query("shouldLoadIcons") boolean shouldLoadIcons);
 
-    public String getDisplayName() { return displayName; }
-    public String getDescription() { return description; }
-    public String getIconUnlocked() { return iconUnlocked; }
-    public String getIconLocked() { return iconLocked; }
 }

@@ -26,18 +26,39 @@
 
  */
 
-package net.badgekeeper.android.objects.achievements;
+package net.badgekeeper.android.objects.models;
 
-import org.json.JSONObject;
 import net.badgekeeper.android.objects.BKObject;
 
-/**
- * Present reward element in Badge Keeper service.
- */
-public class BKAchievementReward extends BKObject {
+import java.util.List;
+import java.util.ArrayList;
+
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+public class BKUnlockedUserAchievementList extends BKObject {
+
+    private List<BKUnlockedUserAchievement> achievements = new ArrayList<BKUnlockedUserAchievement>();
 
     public boolean initWithJson(JSONObject json) {
-        return false;
+        this.achievements.clear();
+
+        try {
+            JSONArray jsonRewards = json.getJSONArray("Result");
+
+            for (int i = 0; i < jsonRewards.length(); ++i) {
+                JSONObject jsonReward = jsonRewards.getJSONObject(i);
+                BKUnlockedUserAchievement achievement = new BKUnlockedUserAchievement();
+                if (achievement.initWithJson(jsonReward)) {
+                    this.achievements.add(achievement);
+                }
+            }
+        }
+        catch (JSONException e) {
+            return false;
+        }
+        return true;
     }
 
 }

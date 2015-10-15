@@ -26,40 +26,26 @@
 
  */
 
-package net.badgekeeper.android.objects.achievements;
+package net.badgekeeper.android.network;
 
-import java.util.List;
-import java.util.ArrayList;
+import retrofit.Retrofit;
+import retrofit.GsonConverterFactory;
+import retrofit.RxJavaCallAdapterFactory;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import net.badgekeeper.android.objects.BKObject;
+public class BadgeKeeperService {
 
-public class BKUnlockedUserAchievement extends BKObject {
+    private static final String BaseUrl = "https://api.badgekeeper.net/";
+    private BadgeKeeperApi api;
 
-    private List<BKAchievementReward> rewards = new ArrayList<BKAchievementReward>();
-    private BKUserAchievement achievement;
+    public BadgeKeeperService() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
 
-    public boolean initWithJson(JSONObject json) {
-        this.achievement = new BKUserAchievement();
-        this.achievement.initWithJson(json);
-        this.rewards.clear();
-
-        try {
-            JSONArray jsonRewards = json.getJSONArray("Rewards");
-
-            for (int i = 0; i < jsonRewards.length(); ++i) {
-                JSONObject jsonReward = jsonRewards.getJSONObject(i);
-                BKAchievementReward reward = new BKAchievementReward();
-                if (reward.initWithJson(jsonReward)) {
-                    this.rewards.add(reward);
-                }
-            }
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        return true;
+        api = retrofit.create(BadgeKeeperApi.class);
     }
+
+    public BadgeKeeperApi getApi() { return api; }
 }

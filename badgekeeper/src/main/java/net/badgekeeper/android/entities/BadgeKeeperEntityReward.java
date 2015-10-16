@@ -26,24 +26,34 @@
 
  */
 
-package net.badgekeeper.android.objects;
+package net.badgekeeper.android.entities;
 
-import com.google.gson.annotations.SerializedName;
+import io.realm.RealmObject;
 
-public class BadgeKeeperPair<K, V> {
+/**
+ * Entity element of reward for NoSQL storage.
+ */
+public class BadgeKeeperEntityReward extends RealmObject {
+    private String user;
+    private String name;
+    private double value;
 
-    private final @SerializedName("Key") K key;
-    private final @SerializedName("Value") V value;
-
-    public BadgeKeeperPair(K key, V value) {
-        this.key = key;
-        this.value = value;
+    public String getUser() {
+        return user;
     }
-
-    public K getKey() {
-        return key;
+    public void setUser(String user) {
+        this.user = user;
     }
-    public V getValue() {
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public double getValue() {
         return value;
+    }
+    public void setValue(double value) {
+        this.value = value;
     }
 }

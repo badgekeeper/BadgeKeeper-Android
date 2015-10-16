@@ -28,6 +28,9 @@
 
 package net.badgekeeper.android;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -38,28 +41,34 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
+import net.badgekeeper.android.entities.BadgeKeeperEntityStorage;
 import net.badgekeeper.android.network.BadgeKeeperApi;
 import net.badgekeeper.android.network.BadgeKeeperApiService;
-import net.badgekeeper.android.objects.BadgeKeeperPair;
-import net.badgekeeper.android.objects.models.BadgeKeeperProject;
 import net.badgekeeper.android.network.BadgeKeeperResponse;
 import net.badgekeeper.android.network.BadgeKeeperResponseError;
+import net.badgekeeper.android.objects.BadgeKeeperPair;
+import net.badgekeeper.android.objects.models.BadgeKeeperProject;
+import net.badgekeeper.android.objects.models.BadgeKeeperReward;
 import net.badgekeeper.android.objects.models.BadgeKeeperUnlockedAchievement;
 import net.badgekeeper.android.objects.models.BadgeKeeperUserAchievement;
 
 public class BadgeKeeper {
     private static BadgeKeeper instance = new BadgeKeeper();
 
+    // Client application context for storage
+    private Context context = null;
+
     // Service instances
     private BadgeKeeperCallback callback = null;
     private BadgeKeeperApiService service = null;
+    private BadgeKeeperEntityStorage storage = null;
 
     // Service properties
     private String projectId = null;
     private String userId = null;
     private boolean shouldLoadIcons = false;
 
-    // Temporary storages
+    // Temporary storage
     private Map<String, List<BadgeKeeperPair<String, Double>>> postVariables = new HashMap<>();
     private Map<String, List<BadgeKeeperPair<String, Double>>> incrementVariables = new HashMap<>();
 
@@ -69,6 +78,15 @@ public class BadgeKeeper {
 
     private BadgeKeeper() {
         service = new BadgeKeeperApiService();
+        storage = new BadgeKeeperEntityStorage();
+    }
+
+    /**
+     * Setup Client application context (we need it for storage)
+     * @param context - Client application context.
+     */
+    public static void setContext(Context context) {
+        instance.context = context;
     }
 
     /**
@@ -150,7 +168,7 @@ public class BadgeKeeper {
      * @param value - New value to set. Old value will be overwritten.
      * @param key - Target key to validate achievements.
      */
-    public static void preparePostKeyWithValue(String key, double value) {
+    public static void preparePostKeyWithValue(final String key, final double value) {
         instance.prepareKeyWithValue(key, value, instance.postVariables);
     }
 
@@ -159,7 +177,7 @@ public class BadgeKeeper {
      * @param value - Increment old value.
      * @param key - Target key to validate achievements.
      */
-    public static void prepareIncrementKeyWithValue(String key, double value) {
+    public static void prepareIncrementKeyWithValue(final String key, final double value) {
         instance.prepareKeyWithValue(key, value, instance.incrementVariables);
     }
 
@@ -177,7 +195,7 @@ public class BadgeKeeper {
      * @param userId - User ID which prepared values should be sent.
      *               If set to <tt>null</tt> then current active user ID will be used.
      */
-    public static void postPreparedValuesForUserId(String userId) {
+    public static void postPreparedValuesForUserId(final String userId) {
         // Validation
         if (!instance.isParametersValid()) {
             return;
@@ -188,6 +206,7 @@ public class BadgeKeeper {
             final BKInternalCallback<BadgeKeeperUnlockedAchievement[]> callback = new BKInternalCallback<BadgeKeeperUnlockedAchievement[]>() {
                 @Override
                 public void onSuccess(BadgeKeeperUnlockedAchievement[] unlockedUserAchievements) {
+                    instance.saveUnlockedAchievementRewardsForUser(userId, unlockedUserAchievements);
                     instance.callback.onSuccessReceivedUnlockedUserAchievements(unlockedUserAchievements);
                 }
             };
@@ -216,7 +235,7 @@ public class BadgeKeeper {
      * @param userId - User ID which prepared values should be sent.
      *               If set to <tt>null</tt> then current active user ID will be used.
      */
-     public static void incrementPreparedValuesForUserId(String userId) {
+     public static void incrementPreparedValuesForUserId(final String userId) {
          // Validation
          if (!instance.isParametersValid()) {
              return;
@@ -227,6 +246,7 @@ public class BadgeKeeper {
              final BKInternalCallback<BadgeKeeperUnlockedAchievement[]> callback = new BKInternalCallback<BadgeKeeperUnlockedAchievement[]>() {
                  @Override
                  public void onSuccess(BadgeKeeperUnlockedAchievement[] unlockedUserAchievements) {
+                     instance.saveUnlockedAchievementRewardsForUser(userId, unlockedUserAchievements);
                      instance.callback.onSuccessReceivedUnlockedUserAchievements(unlockedUserAchievements);
                  }
              };
@@ -242,24 +262,25 @@ public class BadgeKeeper {
     /**
      * Try to read reward value from storage.
      * @param name - Which value to read.
-     * @param values (as reference) - Output array values for <tt>name</tt> parameter.
      * @return - true (if parameter successfully taken), false (otherwise).
      */
-    public boolean readRewardValuesForNameWithValues(String name, List<Double> values) {
-        //TODO: todo
-        return false;
+    public static BadgeKeeperReward[] readRewardsForName(final String name) {
+        return readRewardsForName(instance.userId, name);
     }
 
     /**
      * Overloaded readRewardValuesForName for specific user.
      * @param userId - Which user rewards should read.
      * @param name - Which value to read.
-     * @param values (as reference) - Output array values for <tt>name</tt> parameter.
      * @return - true (if parameter successfully taken), false (otherwise).
      */
-    public boolean readUserRewardValuesForNameWithValues(String userId, String name, List<Double> values) {
-        //TODO: todo
-        return false;
+    public static BadgeKeeperReward[] readRewardsForName(final String userId, final String name) {
+        if (instance.context == null || userId == null || userId.isEmpty() || name == null || name.isEmpty()) {
+            return null;
+        }
+
+        BadgeKeeperReward[] result = instance.storage.readRewardForUserWithName(instance.context, userId, name);
+        return result;
     }
 
     ///**
@@ -296,6 +317,19 @@ public class BadgeKeeper {
         });
     }
 
+    private void saveUnlockedAchievementRewardsForUser(String userId, BadgeKeeperUnlockedAchievement[] achievements) {
+        if (achievements != null) {
+            for (BadgeKeeperUnlockedAchievement achievement : achievements) {
+                BadgeKeeperReward[] rewards = achievement.getRewards();
+                if (rewards != null) {
+                    for (BadgeKeeperReward reward : rewards) {
+                        storage.saveRewardForUser(this.context, userId, reward.getName(), reward.getValue());
+                    }
+                }
+            }
+        }
+    }
+
     private void prepareKeyWithValue(String key, Double value, Map<String, List<BadgeKeeperPair<String, Double>>> dictionary) {
         if (!dictionary.containsKey(userId)) {
             dictionary.put(userId, new ArrayList<BadgeKeeperPair<String, Double>>());
@@ -309,15 +343,19 @@ public class BadgeKeeper {
     private boolean isParametersValid() {
         assert (this.userId != null && !this.userId.isEmpty());
         if (!isProjectParametersValid() || this.userId == null || this.userId.isEmpty()) {
+            Log.e("BadgeKeeper", "Check userId configuration and try again.");
             return false;
         }
         return true;
     }
+
     private boolean isProjectParametersValid() {
         assert (this.callback != null);
         assert (this.projectId != null && !this.projectId.isEmpty());
+        assert (this.context != null);
 
-        if (this.callback == null || this.projectId == null || this.projectId.isEmpty()) {
+        if (this.context == null || this.callback == null || this.projectId == null || this.projectId.isEmpty()) {
+            Log.e("BadgeKeeper", "Check context/callback/projectId configuration and try again.");
             return false;
         }
         return true;

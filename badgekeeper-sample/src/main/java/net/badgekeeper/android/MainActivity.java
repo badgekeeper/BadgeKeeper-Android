@@ -32,8 +32,9 @@ public class MainActivity extends AppCompatActivity implements BadgeKeeperCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BadgeKeeper.setProjectId("a93a3a6d-d5f3-4b5c-b153-538063af6121");
+        BadgeKeeper.setContext(this);
         BadgeKeeper.setCallback(this);
+        BadgeKeeper.setProjectId("a93a3a6d-d5f3-4b5c-b153-538063af6121");
 
         postButton = (Button)findViewById(R.id.postButton);
         incrementButton = (Button)findViewById(R.id.incrementButton);

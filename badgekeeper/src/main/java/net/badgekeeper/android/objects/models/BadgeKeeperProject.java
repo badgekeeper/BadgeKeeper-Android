@@ -26,24 +26,21 @@
 
  */
 
-package net.badgekeeper.android.objects;
+package net.badgekeeper.android.objects.models;
 
-public class BKKeyValuePair<K, V> {
+import com.google.gson.annotations.SerializedName;
 
-    private final K key;
-    private final V value;
+/**
+ * Contains all information about Project in Badge Keeper service.
+ */
+public class BadgeKeeperProject {
+    private @SerializedName("Title") String title;
+    private @SerializedName("Description") String description;
+    private @SerializedName("Icon") String icon;
+    private @SerializedName("Achievements") BadgeKeeperAchievement[] achievements;
 
-    public BKKeyValuePair(K key, V value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    public K getKey() {
-        return key;
-    }
-
-    public V getValue() {
-        return value;
-    }
-
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public String getIcon() { return icon; }
+    public BadgeKeeperAchievement[] getAchievements() { return achievements; }
 }

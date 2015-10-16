@@ -30,14 +30,18 @@ package net.badgekeeper.android.objects.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class BKProjectInformation {
-    private @SerializedName("Title") String title;
-    private @SerializedName("Description") String description;
-    private @SerializedName("Icon") String icon;
-    private @SerializedName("Achievements") BKProjectAchievement[] achievements;
+/**
+ * Present general element in Badge Keeper service - achievement.
+ */
+public class BadgeKeeperAchievement {
 
-    public String getTitle() { return title; }
+    private @SerializedName("DisplayName") String displayName;
+    private @SerializedName("Description") String description;
+    private @SerializedName("UnlockedIcon") String iconUnlocked;
+    private @SerializedName("LockedIcon") String iconLocked;
+
+    public String getDisplayName() { return displayName; }
     public String getDescription() { return description; }
-    public String getIcon() { return icon; }
-    public BKProjectAchievement[] getAchievements() { return achievements; }
+    public String getIconUnlocked() { return iconUnlocked; }
+    public String getIconLocked() { return iconLocked; }
 }

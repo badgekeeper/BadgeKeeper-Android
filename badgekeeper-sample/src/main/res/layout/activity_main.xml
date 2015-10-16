@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
+    android:gravity="top|center"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -16,7 +16,7 @@
 
     <EditText
         android:id="@+id/userEditText"
-        android:layout_width="200dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -24,7 +24,7 @@
 
     <Button
         android:id="@+id/postButton"
-        android:layout_width="200dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:text="Post value"
         android:layout_below="@+id/editText"
@@ -32,20 +32,35 @@
 
     <Button
         android:id="@+id/incrementButton"
-        android:layout_width="200dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:text="Increment value"
         android:layout_below="@+id/postButton"
         android:layout_centerHorizontal="true" />
 
-    <EditText
+    <Button
+        android:id="@+id/getProjectAchievementsButton"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:text="Get Project achievements"
+        android:layout_below="@+id/incrementButton"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/getUserAchievementsButton"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:text="Get User achievements"
+        android:layout_below="@+id/getProjectAchievementsButton"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
         android:id="@+id/responseEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="15"
-        android:editable="false"
+        android:layout_marginTop="20dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="0.25" />
+        android:layout_weight="0.4"
+        android:ems="15" />
 
 </LinearLayout>

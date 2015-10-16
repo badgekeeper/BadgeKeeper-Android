@@ -26,39 +26,14 @@
 
  */
 
-package net.badgekeeper.android.objects.models;
+package net.badgekeeper.android;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONArray;
-
-public class BKUnlockedUserAchievement {
-
-    private List<BKAchievementReward> rewards = new ArrayList<BKAchievementReward>();
-    private BKUserAchievement achievement;
-
-    public boolean initWithJson(JSONObject json) {
-        this.achievement = new BKUserAchievement();
-        //this.achievement.initWithJson(json);
-        this.rewards.clear();
-
-        try {
-            JSONArray jsonRewards = json.getJSONArray("Rewards");
-
-            for (int i = 0; i < jsonRewards.length(); ++i) {
-                JSONObject jsonReward = jsonRewards.getJSONObject(i);
-                BKAchievementReward reward = new BKAchievementReward();
-                //if (reward.initWithJson(jsonReward)) {
-                //    this.rewards.add(reward);
-                //}
-            }
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        return true;
-    }
+/**
+ * Event types for Badge Keeper service requests.
+ */
+public enum BadgeKeeperEventType {
+    RequestProjectAchievements,
+    RequestUserAchievements,
+    RequestPostingUserVariables,
+    RequestIncrementingUserVariables
 }

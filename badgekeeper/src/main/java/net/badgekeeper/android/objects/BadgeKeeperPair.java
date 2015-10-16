@@ -26,18 +26,24 @@
 
  */
 
-/**
- * Extended BKProjectAchievement for User.
- * Contains extra field with status of user achievement.
- */
-package net.badgekeeper.android.objects.models;
+package net.badgekeeper.android.objects;
 
-import com.google.gson.annotations.SerializedName;
+public class BadgeKeeperPair<K, V> {
 
-public class BKUserAchievement extends BKProjectAchievement {
+    private final K key;
+    private final V value;
 
-    private @SerializedName("IsUnlocked") boolean isUnlocked;
-    public boolean getIsUnlocked() {
-        return isUnlocked;
+    public BadgeKeeperPair(K key, V value) {
+        this.key = key;
+        this.value = value;
     }
+
+    public K getKey() {
+        return key;
+    }
+
+    public V getValue() {
+        return value;
+    }
+
 }

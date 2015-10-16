@@ -28,9 +28,13 @@
 
 package net.badgekeeper.android.objects.models;
 
-/**
- * Present reward element in Badge Keeper service.
- */
-public class BKAchievementReward {
+import com.google.gson.annotations.SerializedName;
 
+/**
+ * Extended BadgeKeeperUserAchievement. Sends when user hit achievement.
+ * Contains extra information about rewards for specified user.
+ */
+public class BadgeKeeperUnlockedAchievement extends BadgeKeeperUserAchievement {
+    private @SerializedName("Rewards") BadgeKeeperReward[] rewards;
+    public BadgeKeeperReward[] getRewards() { return rewards; }
 }

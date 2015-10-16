@@ -29,18 +29,15 @@
 package net.badgekeeper.android.objects.models;
 
 import com.google.gson.annotations.SerializedName;
+
 /**
- * Present general element in Badge Keeper service - achievement.
+ * Extended BadgeKeeperAchievement for User.
+ * Contains extra field with status achievement for specified user.
  */
-public class BKProjectAchievement {
+public class BadgeKeeperUserAchievement extends BadgeKeeperAchievement {
 
-    private @SerializedName("DisplayName") String displayName;
-    private @SerializedName("Description") String description;
-    private @SerializedName("UnlockedIcon") String iconUnlocked;
-    private @SerializedName("LockedIcon") String iconLocked;
-
-    public String getDisplayName() { return displayName; }
-    public String getDescription() { return description; }
-    public String getIconUnlocked() { return iconUnlocked; }
-    public String getIconLocked() { return iconLocked; }
+    private @SerializedName("IsUnlocked") boolean isUnlocked;
+    public boolean getIsUnlocked() {
+        return isUnlocked;
+    }
 }

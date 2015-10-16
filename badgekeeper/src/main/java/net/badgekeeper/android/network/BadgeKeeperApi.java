@@ -36,30 +36,30 @@ import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
-import net.badgekeeper.android.objects.BKKeyValuePair;
-import net.badgekeeper.android.objects.models.BKProjectInformation;
-import net.badgekeeper.android.objects.models.BKUnlockedUserAchievement;
-import net.badgekeeper.android.objects.models.BKUserAchievement;
+import net.badgekeeper.android.objects.BadgeKeeperPair;
+import net.badgekeeper.android.objects.models.BadgeKeeperProject;
+import net.badgekeeper.android.objects.models.BadgeKeeperUnlockedAchievement;
+import net.badgekeeper.android.objects.models.BadgeKeeperUserAchievement;
 
 public interface BadgeKeeperApi {
 
     @GET("api/gateway/{projectId}/get")
-    Call<BadgeKeeperResponse<BKProjectInformation>> getProjectAchievements(@Path("projectId") String projectId,
-                                                                  @Query("shouldLoadIcons") boolean shouldLoadIcons);
+    Call<BadgeKeeperResponse<BadgeKeeperProject>> getProjectAchievements(@Path("projectId") String projectId,
+                                                                           @Query("shouldLoadIcons") boolean shouldLoadIcons);
 
     @GET("api/gateway/{projectId}/users/get/{userId}")
-    Call<BadgeKeeperResponse<BKUserAchievement[]>> getUserAchievements(@Path("projectId") String projectId,
-                                                              @Path("userId") String userId,
-                                                              @Query("shouldLoadIcons") boolean shouldLoadIcons);
+    Call<BadgeKeeperResponse<BadgeKeeperUserAchievement[]>> getUserAchievements(@Path("projectId") String projectId,
+                                                                       @Path("userId") String userId,
+                                                                       @Query("shouldLoadIcons") boolean shouldLoadIcons);
 
     @POST("api/gateway/{projectId}/users/post/{userId}")
-    Call<BadgeKeeperResponse<BKUnlockedUserAchievement[]>> postUserVariables(@Path("projectId") String projectId,
+    Call<BadgeKeeperResponse<BadgeKeeperUnlockedAchievement[]>> postUserVariables(@Path("projectId") String projectId,
                                                                              @Path("userId") String userId,
-                                                                             @Body List<BKKeyValuePair<String, Double>> values);
+                                                                             @Body List<BadgeKeeperPair<String, Double>> values);
 
     @POST("api/gateway/{projectId}/users/increment/{userId}")
-    Call<BadgeKeeperResponse<BKUnlockedUserAchievement[]>> incrementUserVariables(@Path("projectId") String projectId,
+    Call<BadgeKeeperResponse<BadgeKeeperUnlockedAchievement[]>> incrementUserVariables(@Path("projectId") String projectId,
                                                                                   @Path("userId") String userId,
-                                                                                  @Body List<BKKeyValuePair<String, Double>> values);
+                                                                                  @Body List<BadgeKeeperPair<String, Double>> values);
 
 }

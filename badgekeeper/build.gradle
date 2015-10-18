@@ -1,5 +1,29 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'badgekeeper'
+
+    publishedGroupId = 'net.badgekeeper.android'
+    libraryName = 'BadgeKeeper'
+    artifact = 'badgekeeper'
+
+    libraryDescription = 'Badge Keeper Achievement client library for Android OS.'
+
+    siteUrl = 'https://badgekeeper.net'
+    gitUrl = 'https://github.com/badgekeeper/BadgeKeeper-Android.git'
+
+    libraryVersion = '0.1.0'
+
+    developerId = 'badgekeeper'
+    developerName = 'Alexander Pukhov'
+    developerEmail = 'services@badgekeeper.net'
+
+    licenseName = 'The MIT License (MIT)'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
@@ -26,3 +50,6 @@ dependencies {
     compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta2'
     compile 'io.realm:realm-android:0.83.1'
 }
+
+apply from: 'https://raw.githubusercontent.com/badgekeeper/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/badgekeeper/JCenter/master/bintrayv1.gradle'

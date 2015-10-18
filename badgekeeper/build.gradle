@@ -51,5 +51,5 @@ dependencies {
     compile 'io.realm:realm-android:0.83.1'
 }
 
-apply from: 'https://raw.githubusercontent.com/badgekeeper/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/badgekeeper/JCenter/master/bintrayv1.gradle'
+apply from: 'https://raw.githubusercontent.com/badgekeeper/BadgeKeeper-Android/master/install.gradle'
+apply from: 'https://raw.githubusercontent.com/badgekeeper/BadgeKeeper-Android/master/bintray.gradle'

@@ -1,8 +1,8 @@
 package net.badgekeeper.android;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +14,7 @@ import net.badgekeeper.android.objects.models.BadgeKeeperReward;
 import net.badgekeeper.android.objects.models.BadgeKeeperUnlockedAchievement;
 import net.badgekeeper.android.objects.models.BadgeKeeperUserAchievement;
 
-public class MainActivity extends AppCompatActivity implements BadgeKeeperCallback {
+public class MainActivity extends Activity implements BadgeKeeperCallback {
 
     private Button postButton;
     private Button incrementButton;

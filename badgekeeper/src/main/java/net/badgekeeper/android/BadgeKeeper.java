@@ -311,7 +311,7 @@ public class BadgeKeeper {
         return image;
     }
 
-    private <Type> void makeRequest(final BKInternalCallback callback, final BadgeKeeperErrorCallback errorCallback, Call<BadgeKeeperResponse<Type>> call) {
+    private <Type> void makeRequest(final BKInternalCallback<Type> callback, final BadgeKeeperErrorCallback errorCallback, Call<BadgeKeeperResponse<Type>> call) {
 
         call.enqueue(new Callback<BadgeKeeperResponse<Type>>() {
             @Override

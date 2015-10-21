@@ -29,6 +29,9 @@
 package net.badgekeeper.android;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -283,14 +286,19 @@ public class BadgeKeeper {
         return result;
     }
 
-    ///**
-    // * Build image with raw icon data.
-    // * @param iconString - raw icon data from BadgeKeeper service for UnlockedIcon or LockedIcon.
-    // * @return - image (if data exist), null (otherwise).
-    // */
-    //public Image buildImageWithIconString(String iconString) {
-    //    return null;
-    //}
+    /**
+     * Build image with raw icon data.
+     * @param iconString - raw icon data from BadgeKeeper service for UnlockedIcon or LockedIcon.
+     * @return - Bitmap (if data exist), null (otherwise).
+     */
+    public static Bitmap buildImageWithIconString(String iconString) {
+        Bitmap image = null;
+        if (iconString != null && iconString.length() > 0) {
+            byte[] decodedString = Base64.decode(iconString, Base64.DEFAULT);
+            image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        }
+        return image;
+    }
 
     private <Type> void makeRequest(final BKInternalCallback callback, final BadgeKeeperEventType eventType, Call<BadgeKeeperResponse<Type>> call) {
 

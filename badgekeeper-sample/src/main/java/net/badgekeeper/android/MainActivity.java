@@ -9,12 +9,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import net.badgekeeper.android.network.callbacks.BadgeKeeperAchievementsUnlockedCallback;
+import net.badgekeeper.android.network.callbacks.BadgeKeeperProjectAchievementsCallback;
+import net.badgekeeper.android.network.callbacks.BadgeKeeperUserAchievementsCallback;
 import net.badgekeeper.android.objects.models.BadgeKeeperAchievement;
 import net.badgekeeper.android.objects.models.BadgeKeeperReward;
 import net.badgekeeper.android.objects.models.BadgeKeeperUnlockedAchievement;
 import net.badgekeeper.android.objects.models.BadgeKeeperUserAchievement;
 
-public class MainActivity extends Activity implements BadgeKeeperCallback {
+public class MainActivity extends Activity {
 
     private Button postButton;
     private Button incrementButton;
@@ -27,13 +30,16 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
     private static int posts = 0;
     private static int increments = 0;
 
+    private BadgeKeeperProjectAchievementsCallback projectCallback = null;
+    private BadgeKeeperUserAchievementsCallback userCallback = null;
+    private BadgeKeeperAchievementsUnlockedCallback unlockedCallback = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         BadgeKeeper.setContext(this);
-        BadgeKeeper.setCallback(this);
         BadgeKeeper.setProjectId("a93a3a6d-d5f3-4b5c-b153-538063af6121");
 
         postButton = (Button)findViewById(R.id.postButton);
@@ -43,6 +49,67 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
 
         userEditText = (EditText)findViewById(R.id.userEditText);
         responseTextView = (TextView)findViewById(R.id.responseEditText);
+
+        unlockedCallback = new BadgeKeeperAchievementsUnlockedCallback() {
+            @Override
+            public void onSuccess(BadgeKeeperUnlockedAchievement[] achievements) {
+                String result = "";
+                for (BadgeKeeperUnlockedAchievement achievement : achievements) {
+                    result += "Name: " + achievement.getDisplayName() + ", "
+                            + "Description: " + achievement.getDescription() + ", "
+                            + "Is unlocked: " + achievement.getIsUnlocked() + ", "
+                            + "Rewards: [";
+                    for (BadgeKeeperReward reward : achievement.getRewards()) {
+                        result += "Name: " + reward.getName() + "Value: " + String.valueOf(reward.getValue()) + ";";
+                    }
+                    result += "]. " + System.getProperty("line.separator");
+                }
+                responseTextView.setText(result);
+                setLoading(false);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                showError(code, message);
+            }
+        };
+
+        projectCallback = new BadgeKeeperProjectAchievementsCallback() {
+            @Override
+            public void onSuccess(BadgeKeeperAchievement[] achievements) {
+                String result = "";
+                for (BadgeKeeperAchievement achievement : achievements) {
+                    result += "Name: " + achievement.getDisplayName() + ", "
+                            + "Description: " + achievement.getDescription() + System.getProperty("line.separator");
+                }
+                responseTextView.setText(result);
+                setLoading(false);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                showError(code, message);
+            }
+        };
+
+        userCallback = new BadgeKeeperUserAchievementsCallback() {
+            @Override
+            public void onSuccess(BadgeKeeperUserAchievement[] achievements) {
+                String result = "";
+                for (BadgeKeeperUserAchievement achievement : achievements) {
+                    result += "Name: " + achievement.getDisplayName() + ", "
+                            + "Description: " + achievement.getDescription() + ", "
+                            + "Is unlocked: " + achievement.getIsUnlocked() + ". " + System.getProperty("line.separator");
+                }
+                responseTextView.setText(result);
+                setLoading(false);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                showError(code, message);
+            }
+        };
 
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +122,7 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
 
                 BadgeKeeper.setUserId(userEditText.getText().toString());
                 BadgeKeeper.preparePostKeyWithValue("x", posts);
-                BadgeKeeper.postPreparedValues();
+                BadgeKeeper.postPreparedValues(unlockedCallback);
             }
             }
         });
@@ -72,7 +139,7 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
 
                     BadgeKeeper.setUserId(userEditText.getText().toString());
                     BadgeKeeper.prepareIncrementKeyWithValue("x", increments);
-                    BadgeKeeper.incrementPreparedValues();
+                    BadgeKeeper.incrementPreparedValues(unlockedCallback);
                 }
             }
         });
@@ -82,7 +149,7 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
             public void onClick(View v) {
                 setLoading(true);
                 responseTextView.setText("");
-                BadgeKeeper.requestProjectAchievements();
+                BadgeKeeper.getProjectAchievements(projectCallback);
             }
         });
 
@@ -94,7 +161,7 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
                     responseTextView.setText("");
 
                     BadgeKeeper.setUserId(userEditText.getText().toString());
-                    BadgeKeeper.requestUserAchievements();
+                    BadgeKeeper.getUserAchievements(userCallback);
                 }
             }
         });
@@ -142,50 +209,5 @@ public class MainActivity extends Activity implements BadgeKeeperCallback {
     private void showError(int code, String message) {
         showErrorWithTitleAndMessage("Error code: " + String.valueOf(code), message);
         setLoading(false);
-    }
-
-    @Override
-    public void onSuccessReceivedProjectAchievements(BadgeKeeperAchievement[] achievements) {
-        String result = "";
-        for (BadgeKeeperAchievement achievement : achievements) {
-            result += "Name: " + achievement.getDisplayName() + ", "
-                   + "Description: " + achievement.getDescription() + System.getProperty("line.separator");
-        }
-        this.responseTextView.setText(result);
-        setLoading(false);
-    }
-
-    @Override
-    public void onSuccessReceivedUserAchievements(BadgeKeeperUserAchievement[] achievements) {
-        String result = "";
-        for (BadgeKeeperUserAchievement achievement : achievements) {
-            result += "Name: " + achievement.getDisplayName() + ", "
-                    + "Description: " + achievement.getDescription() + ", "
-                    + "Is unlocked: " + achievement.getIsUnlocked() + ". " + System.getProperty("line.separator");
-        }
-        this.responseTextView.setText(result);
-        setLoading(false);
-    }
-
-    @Override
-    public void onSuccessReceivedUnlockedUserAchievements(BadgeKeeperUnlockedAchievement[] achievements) {
-        String result = "";
-        for (BadgeKeeperUnlockedAchievement achievement : achievements) {
-            result += "Name: " + achievement.getDisplayName() + ", "
-                    + "Description: " + achievement.getDescription() + ", "
-                    + "Is unlocked: " + achievement.getIsUnlocked() + ", "
-                    + "Rewards: [";
-            for (BadgeKeeperReward reward : achievement.getRewards()) {
-                result += "Name: " + reward.getName() + "Value: " + String.valueOf(reward.getValue()) + ";";
-            }
-            result += "]. " + System.getProperty("line.separator");
-        }
-        this.responseTextView.setText(result);
-        setLoading(false);
-    }
-
-    @Override
-    public void onErrorReceived(BadgeKeeperEventType evenType, int code, String message) {
-        showError(code, message);
     }
 }

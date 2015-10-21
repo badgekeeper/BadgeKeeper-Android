@@ -26,38 +26,17 @@
 
  */
 
-package net.badgekeeper.android;
+package net.badgekeeper.android.network.callbacks;
 
-import net.badgekeeper.android.objects.models.BadgeKeeperAchievement;
-import net.badgekeeper.android.objects.models.BadgeKeeperUnlockedAchievement;
 import net.badgekeeper.android.objects.models.BadgeKeeperUserAchievement;
 
 /**
- * Interface for notifying your app when response received from Badge Keeper service.
+ * Interfaces for notifying your app when response received from Badge Keeper service.
  */
-public interface BadgeKeeperCallback {
-    /**
-     * Project achievements successfully received.
-     * @param achievements - received achievements array.
-     */
-    void onSuccessReceivedProjectAchievements(BadgeKeeperAchievement[] achievements);
-
+public interface BadgeKeeperUserAchievementsCallback extends BadgeKeeperErrorCallback {
     /**
      * User achievements successfully received.
      * @param achievements - received achievements array.
      */
-    void onSuccessReceivedUserAchievements(BadgeKeeperUserAchievement[] achievements);
-
-    /**
-     * Unlocked user achievements successfully received (if exist).
-     * @param achievements - received achievements array.
-     */
-    void onSuccessReceivedUnlockedUserAchievements(BadgeKeeperUnlockedAchievement[] achievements);
-
-    /**
-     * Something goes wrong with request.
-     * @param code - error code.
-     * @param message - error message.
-     */
-    void onErrorReceived(BadgeKeeperEventType evenType, int code, String message);
+    public void onSuccess(BadgeKeeperUserAchievement[] achievements);
 }

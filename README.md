@@ -1,7 +1,10 @@
 # Badge Keeper
 
 Badge Keeper Android library will help add achievement system to your app easily.
+
 More information you can find here: [Badge Keeper official site](https://badgekeeper.net)
+
+Test your project from web browser here: [Badge Keeper Api](https://api.badgekeeper.net/swagger/ui/index)
 
 [![Build Status](https://travis-ci.org/badgekeeper/BadgeKeeper-Android.svg?branch=master)](https://travis-ci.org/badgekeeper/BadgeKeeper-iOS)
 [![Version](https://img.shields.io/cocoapods/v/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)

@@ -7,9 +7,7 @@ More information you can find here: [Badge Keeper official site](https://badgeke
 Test your project from web browser here: [Badge Keeper Api](https://api.badgekeeper.net/swagger/ui/index)
 
 [![Build Status](https://travis-ci.org/badgekeeper/BadgeKeeper-Android.svg?branch=master)](https://travis-ci.org/badgekeeper/BadgeKeeper-iOS)
-[![Version](https://img.shields.io/cocoapods/v/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)
-[![Platform](https://img.shields.io/cocoapods/p/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)
-[![License](https://img.shields.io/cocoapods/l/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)
+[![Version](https://img.shields.io/bintray/v/badgekeeper/maven/badgekeeper.svg)](https://bintray.com/badgekeeper/maven/badgekeeper/_latestVersion)
 
 ## Getting Started
 

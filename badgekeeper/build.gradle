@@ -19,9 +19,9 @@ ext {
     developerName = 'Alexander Pukhov'
     developerEmail = 'services@badgekeeper.net'
 
-    licenseName = 'The MIT License (MIT)'
-    licenseUrl = 'https://opensource.org/licenses/MIT'
-    allLicenses = ["MIT"]
+    licenseName = 'Apache License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0'
+    allLicenses = ["Apache License, Version 2.0"]
 }
 
 android {
@@ -50,7 +50,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
     compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta2'
-    compile 'io.realm:realm-android:0.83.1'
+    compile 'io.realm:realm-android:0.84.0'
 }
 
 apply from: 'https://raw.githubusercontent.com/badgekeeper/BadgeKeeper-Android/master/install.gradle'

@@ -1,4 +1,13 @@
-language: java
+language: android
 
 jdk:
   - oraclejdk7
+  
+android:
+  components:
+    - build-tools-23.0.1
+    - android-23
+
+before_install:
+  # replace default build.gradle'
+  - mv badgekeeper/build.travis.gradle badgekeeper/build.gradle

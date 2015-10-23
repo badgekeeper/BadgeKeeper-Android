@@ -7,18 +7,24 @@ More information you can find here: [Badge Keeper official site](https://badgeke
 Test your project from web browser here: [Badge Keeper Api](https://api.badgekeeper.net/swagger/ui/index)
 
 [![Build Status](https://travis-ci.org/badgekeeper/BadgeKeeper-Android.svg?branch=master)](https://travis-ci.org/badgekeeper/BadgeKeeper-iOS)
+[![Maven Central](https://img.shields.io/maven-central/v/net.badgekeeper.android/badgekeeper.svg)](http://search.maven.org/#artifactdetails%7Cnet.badgekeeper.android%7Cbadgekeeper%7C0.1.5%7C)
 [![Version](https://img.shields.io/bintray/v/badgekeeper/maven/badgekeeper.svg)](https://bintray.com/badgekeeper/maven/badgekeeper/_latestVersion)
 [![License](https://img.shields.io/badge/license-Apache%20License%2C%20Version%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ## Getting Started
 
 Using Gradle:
-
-To integrate Badge Keeper library make sure your project uses jCenter as a dependency repository.
-
-Add config below to the dependencies of your project and sync project.
 ```
-compile 'net.badgekeeper.android:badgekeeper:0.1.4'
+compile 'net.badgekeeper.android:badgekeeper:0.1.5'
+```
+
+Using Maven:
+```
+<dependency>
+    <groupId>net.badgekeeper.android</groupId>
+    <artifactId>badgekeeper</artifactId>
+    <version>0.1.5</version>
+</dependency>
 ```
 
 ## Usage

@@ -1,145 +1,145 @@
-# BadgeKeeper
-BadgeKeeper service lightweight client library.
+# Badge Keeper
 
-## Adding BadgeKeeper to your project
+Badge Keeper Android library will help add achievement system to your app easily.
+More information you can find here: [Badge Keeper official site](https://badgekeeper.net)
 
-### Cocoapods
+[![Build Status](https://travis-ci.org/badgekeeper/BadgeKeeper-Android.svg?branch=master)](https://travis-ci.org/badgekeeper/BadgeKeeper-iOS)
+[![Version](https://img.shields.io/cocoapods/v/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)
+[![Platform](https://img.shields.io/cocoapods/p/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)
+[![License](https://img.shields.io/cocoapods/l/BadgeKeeper.svg)](http://cocoadocs.org/docsets/BadgeKeeper)
 
-[CocoaPods](http://cocoapods.org) is the recommended way to add BadgeKeeper to your project.
+## Getting Started
 
-1. Add a pod entry for BadgeKeeper to your Podfile `pod 'BadgeKeeper'`
-2. Install the pod(s) by running `pod install`.
-3. Include BadgeKeeper wherever you need it with `#import "BadgeKeeper.h"`.
-
-### How to use
-
-#### Setup project
+To integrate Badge Keeper library make sure your project uses jCenter as a dependency repository.
+Add config below to the dependencies of your project and sync project.
 ```
-[BadgeKeeper instance].projectId = <ProjectId from admin panel>;
-```
-#### Setup user
-```
-[BadgeKeeper instance].userId = <Your client id>;
-```
-#### Setup loading icons flag
-```
-[BadgeKeeper instance].shouldLoadIcons = YES / NO;
+compile 'net.badgekeeper.android:badgekeeper:0.1.4'
 ```
 
-#### Subscribe to response for post and increment requests
+## Usage
+
+### Basic Initialization
+
+```java
+BadgeKeeper.setContext(this); // this = Context object
+BadgeKeeper.setProjectId("Project Id from admin panel");
+BadgeKeeper.setUserId("Your client id");
+BadgeKeeper.setShouldLoadIcons(true); // default is false
 ```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidSendValues:)
-                            name:kBKNotificationDidPostPreparedValues
-                            object:nil];
-```
-or
-```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidSendValues:)
-                            name:kBKNotificationDidIncrementPreparedValues
-                            object:nil];
-```
-After that you can catch notification results
-```
-- (void)clientDidSendValues:(NSNotification *)notification {
-    NSArray *achievements = notification.userInfo[kBKNotificationKeyResponseObject];
+
+That's all settings that need to be configured.
+
+### Callbacks
+
+There are four callbacks that we will use to receive results from Badge Keeper service:
+
+```java
+// 1 - Returns error code and error message if something goes wrong
+public interface BadgeKeeperErrorCallback {
+    public void onError(int code, String message);
+}
+
+// 2 - Returns array of BadgeKeeperAchievement elements
+public interface BadgeKeeperProjectAchievementsCallback extends BadgeKeeperErrorCallback {
+    public void onSuccess(BadgeKeeperAchievement[] achievements);
+}
+
+// 3 - Returns array of BadgeKeeperUserAchievement elements
+public interface BadgeKeeperUserAchievementsCallback extends BadgeKeeperErrorCallback {
+    public void onSuccess(BadgeKeeperUserAchievement[] achievements);
+}
+
+// 4 - Returns array of BadgeKeeperUnlockedAchievement elements
+public interface BadgeKeeperAchievementsUnlockedCallback extends BadgeKeeperErrorCallback {
+    public void onSuccess(BadgeKeeperUnlockedAchievement[] achievements);
 }
 ```
-where achievements is array of BKUnlockedUserAchievement objects.
 
-#### Subscribe to response for getting achievements by project
-```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidReceiveProjectAchievements:)
-                            name:kBKNotificationDidReceiveProjectAchievements
-                            object:nil];
-```
-and handler method
-```
-- (void)clientDidReceiveProjectAchievements:(NSNotification *)notification {
-    NSArray *achievements = notification.userInfo[kBKNotificationKeyResponseObject];
-}
-```
-where achievements is array of BKProjectAchievement objects.
+### Get project achievements (no userId required)
 
-#### Subscribe to response for getting achievements by user
-```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidReceiveUserAchievements:)
-                            name:kBKNotificationDidReceiveUserAchievements
-                            object:nil];
-```
-and handler method
-```
-- (void)clientDidReceiveUserAchievements:(NSNotification *)notification {
-    NSArray *achievements = notification.userInfo[kBKNotificationKeyResponseObject];
-}
-```
-where achievements is array of BKUserAchievement objects.
-
-#### Post variable
-```
-[[BadgeKeeper instance] preparePostValue:100 forKey:@"Variable"];
-[[BadgeKeeper instance] postPreparedValues];
-```
-#### Increment variable
-```
-[[BadgeKeeper instance] prepareIncrementValue:20 forKey:@"Variable"];
-[[BadgeKeeper instance] incrementPreparedValues];
+```java
+BadgeKeeper.getProjectAchievements(new BadgeKeeperProjectAchievementsCallback() {
+	@Override
+    public void onSuccess(BadgeKeeperAchievement[] achievements) {
+		// Put logic here
+	}
+	
+	@Override
+    public void onError(int code, String message) {
+    	// Put logic here
+	}
+});
 ```
 
-### Error handling
-To handle error response from Badge Keeper service you should use notifications.
-```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidReceiveErrorProjectAchievements:)
-                            name:kBKNotificationFailedReceiveProjectAchievements
-                            object:nil];
-```
-to handle error response for getting achievements by project
+### Get user achievements
 
+```java
+BadgeKeeper.getUserAchievements(new BadgeKeeperUserAchievementsCallback() {
+    @Override
+    public void onSuccess(BadgeKeeperUserAchievement[] achievements) {
+    	// Put logic here
+    }
+	
+	@Override
+	public void onError(int code, String message) {
+		// Put logic here
+	}
+});
 ```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidReceiveErrorUserAchievements:)
-                            name:kBKNotificationFailedReceiveUserAchievements
-                            object:nil];
-```
-to handle error response for getting achievements by user
 
-```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidReceiveErrorPostPreparedValues:)
-                            name:kBKNotificationFailedPostPreparedValues
-                            object:nil];
-```
-to handle error response for posting variables
+### Post user variables and validate completed achievements
 
-```
-[[NSNotificationCenter defaultCenter]
-                            addObserver:self
-                            selector:@selector(clientDidReceiveErrorIncrementPreparedValues:)
-                            name:kBKNotificationFailedIncrementPreparedValues
-                            object:nil];
-```
-to handle error response for increment variables
+```java
+BadgeKeeper.preparePostKeyWithValue("x", 0);
 
-Example how to work with error notification
+BadgeKeeper.postPreparedValues(new BadgeKeeperAchievementsUnlockedCallback() {
+	@Override
+	public void onSuccess(BadgeKeeperUnlockedAchievement[] achievements) {
+		// Put logic here
+	}
+
+	@Override
+	public void onError(int code, String message) {
+		// Put logic here
+    }
+});
 ```
-- (void)clientDidReceiveErrorUserAchievements:(NSNotification *)notification {
-    NSError *error = notification.userInfo[kBKNotificationKeyErrorObject];
-    NSString *text = [NSString stringWithFormat:@"Code: %ld, Message: %@",
-                      (unsigned long)error.code, error.localizedDescription];
-}
+
+### Increment user variables and validate completed achievements
+
+```java
+BadgeKeeper.prepareIncrementKeyWithValue("x", 1);
+
+BadgeKeeper.incrementPreparedValues(new BadgeKeeperAchievementsUnlockedCallback() {
+	@Override
+	public void onSuccess(BadgeKeeperUnlockedAchievement[] achievements) {
+		// Put logic here
+	}
+
+	@Override
+	public void onError(int code, String message) {
+		// Put logic here
+    }
+});
 ```
+
+## Requirements
+
+* JDK version >=7.
+* We support all Android versions since API Level 14 (Android 4.0, 4.0.1, 4.0.2 Ice Cream Sandwich & above).
 
 ## License
 
-MIT. See `LICENSE` for details.
+	Copyright 2015 Badge Keeper
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+    	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
